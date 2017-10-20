@@ -28,3 +28,5 @@ Python automatically installed with Mac. Windows does not have this.
 
 #### Questions?
 ## Let's Start!
+
+We're going to making a mini-artist look up program.
