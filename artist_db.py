@@ -1,12 +1,8 @@
 import csv
-from operator import itemgetter, attrgetter
+from operator import itemgetter
+
 
 def create_db(filename='str'):
-    # db = {
-    #   artist : {
-    #       track: (album, url)
-    #   }
-    # }
     db = {}
 
     with open(filename, 'r') as f:
@@ -15,16 +11,15 @@ def create_db(filename='str'):
         # parse out csv
         for row in reader:
             artist = row[0].lower()
-            track = row[1].lower()
+            track = row[1]
             album = row[2]
             url = row[3]
+            popularity = row[4]
 
-            track_tuple = (track, album, url)
+            track_tuple = (track, album, url, popularity)
 
             # construct db
             if db.get(artist) == None:
-                track_obj = {}
-
                 db[artist] = [track_tuple]
             else:
                 track_info = db[artist]
@@ -34,14 +29,16 @@ def create_db(filename='str'):
 
     return db
 
+
 def get_inputs(db={}):
     user_artist = input('Enter an artist: ')
 
     while (db.get(user_artist.lower()) == None):
-        print("Error: Your artist cannot be found! Please try again")
+        print('Error: Your artist cannot be found! Please try again')
         user_artist = input('Enter an artist: ')
 
     return user_artist
+
 
 def find_artist(db={}, artist='str'):
     artist = artist.lower()
@@ -49,24 +46,35 @@ def find_artist(db={}, artist='str'):
 
     return tracks
 
-def print_info(tracks=[], user_artist="str"):
-    artist = "{artist} INFORMATION"
-    info = "====================================================\n\
-    TRACK: {track}\n\
-    ALBUM: {album}\n\
-    SPOTIFY_URL: {url}\n"
-    total_info = "====================================================\n\
-    TOTAL NUMBER OF TRACKS: {total}"
+
+def print_info(tracks=[], user_artist='str'):
+    artist = '\n\nHere is some information about {artist}:'
+    track_info = '=======================================================================\n' \
+                'TRACK: {track}\n' \
+                'ALBUM: {album}\n' \
+                'SPOTIFY_URL: {url}\n' \
+                'POPULARITY: {popularity}\n'
+    total_info = '\nTOTAL NUMBER OF TRACKS: {total}'
+    popular_info = 'MOST POPULAR TRACK:\n'
 
     tracks = sorted(tracks, key=itemgetter(1))
-    total = 0
+    total = len(tracks)
+    most_popular = 0
 
     print(artist.format(artist=user_artist.title()))
     for track in tracks:
-        total += 1
-        print(info.format(track=track[0].title(), album=track[1].title(), url=track[2]))
+        popularity = int(track[3])
+
+        track = track_info.format(track=track[0], album=track[1].title(), url=track[2], popularity=popularity)
+        print(track)
+
+        if popularity > most_popular:
+            popular_info = 'MOST POPULAR TRACK:\n' + track
+            most_popular = popularity
 
     print(total_info.format(total=total))
+    print(popular_info)
+
 
 def main():
     db = create_db('artists.csv')
